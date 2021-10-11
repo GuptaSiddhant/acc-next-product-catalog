@@ -1,8 +1,34 @@
-import Head from 'next/head'
-import Image from 'next/image'
-import styles from '../styles/Home.module.css'
+import Head from "next/head";
+import styles from "../styles/Home.module.css";
+import ProductList from "../components/ProductList";
+import { useState, useMemo } from "react";
+import useQuery from "../utils/useQuery";
+import Loading from "../components/Loading";
+import Link from "next/link";
+
+const DEFAULT_CATEGORY = "all";
 
 export default function Home() {
+  const [products, { loading: productsLoading }] = useQuery("products");
+  const [categories, { loading: categoriesLoading }] = useQuery(
+    "products/categories"
+  );
+
+  const [selectedCategory, setSelectedCategory] = useState(DEFAULT_CATEGORY);
+  // const [filteredProducts, setFilteredProducts] = useState(data);
+
+  const filteredProducts = useMemo(
+    () =>
+      selectedCategory === DEFAULT_CATEGORY
+        ? products || []
+        : products?.filter(
+            (product) => product.category === selectedCategory
+          ) || [],
+    [selectedCategory, products]
+  );
+
+  const handleCategoryChange = (e) => setSelectedCategory(e.target.value);
+
   return (
     <div className={styles.container}>
       <Head>
@@ -12,58 +38,28 @@ export default function Home() {
       </Head>
 
       <main className={styles.main}>
-        <h1 className={styles.title}>
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
+        <h1 className={styles.title}>Group 2 awesome products!</h1>
 
-        <p className={styles.description}>
-          Get started by editing{' '}
-          <code className={styles.code}>pages/index.js</code>
-        </p>
+        <Link href="/product/new">
+          <a>Add Product</a>
+        </Link>
 
-        <div className={styles.grid}>
-          <a href="https://nextjs.org/docs" className={styles.card}>
-            <h2>Documentation &rarr;</h2>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
-
-          <a href="https://nextjs.org/learn" className={styles.card}>
-            <h2>Learn &rarr;</h2>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a
-            href="https://github.com/vercel/next.js/tree/master/examples"
-            className={styles.card}
-          >
-            <h2>Examples &rarr;</h2>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-          >
-            <h2>Deploy &rarr;</h2>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
-        </div>
+        <select value={selectedCategory} onChange={handleCategoryChange}>
+          <option value={DEFAULT_CATEGORY}>All</option>
+          {(categories || []).map((category) => (
+            <option key={category} value={category}>
+              {category}
+            </option>
+          ))}
+        </select>
+        {productsLoading ? (
+          <Loading />
+        ) : (
+          <ProductList products={filteredProducts} />
+        )}
       </main>
 
-      <footer className={styles.footer}>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <span className={styles.logo}>
-            <Image src="/vercel.svg" alt="Vercel Logo" width={72} height={16} />
-          </span>
-        </a>
-      </footer>
+      <footer className={styles.footer}></footer>
     </div>
-  )
+  );
 }
