@@ -10,9 +10,7 @@ const DEFAULT_CATEGORY = "all";
 
 export default function Home() {
   const [products, { loading: productsLoading }] = useQuery("products");
-  const [categories, { loading: categoriesLoading }] = useQuery(
-    "products/categories"
-  );
+  const [categories] = useQuery("products/categories");
 
   const [selectedCategory, setSelectedCategory] = useState(DEFAULT_CATEGORY);
   // const [filteredProducts, setFilteredProducts] = useState(data);

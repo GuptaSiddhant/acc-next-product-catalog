@@ -11,7 +11,7 @@ export default function ProductPage() {
   const { id } = router.query;
   const [product, { loading }] = useQuery(`products/${id}`);
 
-  if (!product) return null;
+  if (!product) return <Loading />;
   const { title, price, image, description, category, rating } = product;
 
   return (
