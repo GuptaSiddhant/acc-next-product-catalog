@@ -1,17 +1,16 @@
 import Head from "next/head";
 import Link from "next/link";
 import Image from "next/image";
-import styles from "../../styles/Home.module.css";
 import { useRouter } from "next/router";
-import useQuery from "../../utils/useQuery";
-import Loading from "../../components/Loading";
+import styles from "../../styles/Home.module.css";
 
-export default function ProductPage() {
+export default function ProductPage({ product }) {
   const router = useRouter();
-  const { id } = router.query;
-  const [product, { loading }] = useQuery(`products/${id}`);
 
-  if (!product) return <Loading />;
+  if (router.isFallback) {
+    return <p>This product is not available</p>;
+  }
+
   const { title, price, image, description, category, rating } = product;
 
   return (
@@ -25,40 +24,43 @@ export default function ProductPage() {
         <Link href="/">
           <a>Back</a>
         </Link>
-        {loading ? (
-          <Loading />
-        ) : (
-          <>
-            <h1 className={styles.title}>{title}</h1>
-            <Image src={image} width={100} height={100} />
-            <p>{category}</p>
-            <p>{price}</p>
-            <p>{description}</p>
-            <p>
-              Rating: {rating.rate} ({rating.count} reviews)
-            </p>
-          </>
-        )}
+
+        <h1 className={styles.title}>{title}</h1>
+        <Image src={image} width={100} height={100} />
+        <p>{category}</p>
+        <p>{price}</p>
+        <p>{description}</p>
+        <p>
+          Rating: {rating.rate} ({rating.count} reviews)
+        </p>
       </main>
     </div>
   );
 }
 
-// export async function getStaticProps(context) {
-//   const { id } = context.params;
-//   const product = data.find((product) => id === product.id.toString());
-//   return {
-//     props: { product },
-//   };
-// }
+export async function getStaticProps(context) {
+  const { id } = context.params;
 
-// export async function getStaticPaths() {
-//   const paths = data.map((product) => ({
-//     params: { id: product.id.toString() },
-//   }));
+  const productResponse = await fetch(
+    `https://fakestoreapi.com/products/${id}`
+  );
+  const product = await productResponse.json();
 
-//   return {
-//     paths,
-//     fallback: false,
-//   };
-// }
+  return {
+    props: { product },
+  };
+}
+
+export async function getStaticPaths() {
+  const productsResponse = await fetch("https://fakestoreapi.com/products");
+  const products = await productsResponse.json();
+
+  const paths = products.map((product) => ({
+    params: { id: product.id.toString() },
+  }));
+
+  return {
+    paths,
+    fallback: true,
+  };
+}

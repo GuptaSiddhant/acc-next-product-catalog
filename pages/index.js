@@ -8,20 +8,16 @@ import Link from "next/link";
 
 const DEFAULT_CATEGORY = "all";
 
-export default function Home() {
-  const [products, { loading: productsLoading }] = useQuery("products");
-  const [categories] = useQuery("products/categories");
+export default function Home(props) {
+  const { products = [], categories = [] } = props;
 
   const [selectedCategory, setSelectedCategory] = useState(DEFAULT_CATEGORY);
-  // const [filteredProducts, setFilteredProducts] = useState(data);
 
   const filteredProducts = useMemo(
     () =>
       selectedCategory === DEFAULT_CATEGORY
-        ? products || []
-        : products?.filter(
-            (product) => product.category === selectedCategory
-          ) || [],
+        ? products
+        : products?.filter((product) => product.category === selectedCategory),
     [selectedCategory, products]
   );
 
@@ -44,20 +40,35 @@ export default function Home() {
 
         <select value={selectedCategory} onChange={handleCategoryChange}>
           <option value={DEFAULT_CATEGORY}>All</option>
-          {(categories || []).map((category) => (
+          {categories.map((category) => (
             <option key={category} value={category}>
               {category}
             </option>
           ))}
         </select>
-        {productsLoading ? (
-          <Loading />
-        ) : (
-          <ProductList products={filteredProducts} />
-        )}
+
+        <ProductList products={filteredProducts} />
       </main>
 
       <footer className={styles.footer}></footer>
     </div>
   );
+}
+
+export async function getServerSideProps() {
+  const categories = await (
+    await fetch("https://fakestoreapi.com/products/categories")
+  ).json();
+
+  const productsResponse = await fetch("https://fakestoreapi.com/products");
+  const products = await productsResponse.json();
+
+  if (!categories || !products) return { notFound: true };
+
+  return {
+    props: {
+      categories,
+      products,
+    },
+  };
 }
