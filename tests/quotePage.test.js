@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import React from "react";
-import Quotes from ".";
+import Quotes from "../pages/quotes";
 
 const quotes = [
   {

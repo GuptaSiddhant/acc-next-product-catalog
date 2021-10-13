@@ -1,7 +1,7 @@
 // import { render, screen } from "@testing-library/react";
 // import React from "react";
-import { loginUser, userIdSelector } from "./authSlice";
-import reducer, { initialState } from "./authSlice";
+import { loginUser, userIdSelector } from "../features/auth/authSlice";
+import reducer, { initialState } from "../features/auth/authSlice";
 
 const USER_ID = "mrauthoto";
 global.fetch = jest.fn(() =>
