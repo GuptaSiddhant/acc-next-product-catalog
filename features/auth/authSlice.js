@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
-const initialState = {
+export const initialState = {
   userId: null,
   bankAccountNo: null,
   status: "",
@@ -25,7 +25,6 @@ const loginUser = createAsyncThunk(
 );
 
 const logoutUser = createAsyncThunk("auth/logoutUser", async ({ userId }) => {
-  console.log(userId);
   const response = await fetch("http://localhost:3000/api/logout", {
     method: "POST",
     body: JSON.stringify({ userId }),
