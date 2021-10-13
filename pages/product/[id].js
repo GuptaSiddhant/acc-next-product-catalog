@@ -21,7 +21,7 @@ export default function ProductPage({ product }) {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className={styles.main}>
-        <Link href="/">
+        <Link href="/product">
           <a>Back</a>
         </Link>
 
